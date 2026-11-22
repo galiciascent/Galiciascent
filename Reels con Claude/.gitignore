@@ -1,0 +1,13 @@
+# Los vídeos y el audio pesan demasiado para GitHub: se quedan solo en la sesión.
+Tomas/*
+!Tomas/LEEME.txt
+Música/*
+!Música/LEEME.txt
+Reels/*/trabajo/
+*.mp4
+*.mov
+*.m4a
+*.wav
+*.mp3
+*.mkv
+*.avi
