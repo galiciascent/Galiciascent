@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Display; src: url(fonts/display-italic.ttf); font-style: italic; font-weight: 400 900; }
+@font-face { font-family: Display; src: url(fonts/display.ttf); font-weight: 400 900; }
+@font-face { font-family: UI; src: url(fonts/ui-bold.woff2); font-weight: 700; }
+body{margin:0;background:#0C0907}</style></head><body><canvas id="c" width="2400" height="1100"></canvas>
+<script type="module">
+import { drawAmbar } from './ambar.js';
+import { drawNube, drawRosa, drawMeiga } from './opciones.js';
+await document.fonts.load('italic 600 44px Display'); await document.fonts.load('700 40px UI'); await document.fonts.load('600 40px Display');
+const c = document.getElementById('c').getContext('2d');
+c.fillStyle='#0C0907'; c.fillRect(0,0,2400,1100);
+const g=c.createRadialGradient(1200,500,100,1200,550,1300); g.addColorStop(0,'rgba(227,170,100,0.16)'); g.addColorStop(1,'rgba(227,170,100,0)'); c.fillStyle=g; c.fillRect(0,0,2400,1100);
+const opts = [
+ ['A · ÁMBAR', 'el decant', (S)=>drawAmbar(c, S), {mouth:{open:0.6,smile:0.8}, armL:[2.2,0.3], armR:[0.3,0.3], handL:'wave', blush:0.6}],
+ ['B · NUBE', 'nube de perfume', (S)=>drawNube(c, S), {open:0.6, armL:1.4, armR:0.4, t:0.4}],
+ ['C · ROSA', 'rosa de Damasco', (S)=>drawRosa(c, S), {open:0.5, armL:0.9, armR:0.2}],
+ ['D · MEIGA', 'meiga perfumista', (S)=>drawMeiga(c, S), {open:0.5, armR:1.2, armL:0.2, wink:1}],
+];
+opts.forEach(([name,sub,fn,S],i)=>{
+  const x=300+i*600, y=880;
+  c.save(); c.translate(x,y+10); c.scale(0.9,0.9); fn({t:1,...S}); c.restore();
+  c.textAlign='center';
+  c.fillStyle='#E3AA64'; c.font='700 40px UI'; c.letterSpacing='5px'; c.fillText(name,x,975);
+  c.fillStyle='#F0E6D6'; c.font='italic 600 42px Display'; c.letterSpacing='0px'; c.fillText(sub,x,1035);
+});
+window.done=true;
+</script></body></html>
