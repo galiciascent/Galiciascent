@@ -1,0 +1,38 @@
+[
+ {
+  "family": "Cormorant Garamond",
+  "weight": "500",
+  "style": "italic",
+  "subset": "all",
+  "range": "",
+  "file": "cormorant-garamond-500-italic-all-0.ttf",
+  "src": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5wDDOjw.ttf"
+ },
+ {
+  "family": "Cormorant Garamond",
+  "weight": "600",
+  "style": "italic",
+  "subset": "all",
+  "range": "",
+  "file": "cormorant-garamond-600-italic-all-1.ttf",
+  "src": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5LDfOjw.ttf"
+ },
+ {
+  "family": "Cormorant Garamond",
+  "weight": "500",
+  "style": "normal",
+  "subset": "all",
+  "range": "",
+  "file": "cormorant-garamond-500-normal-all-2.ttf",
+  "src": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_s06GnM.ttf"
+ },
+ {
+  "family": "Cormorant Garamond",
+  "weight": "600",
+  "style": "normal",
+  "subset": "all",
+  "range": "",
+  "file": "cormorant-garamond-600-normal-all-3.ttf",
+  "src": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_iE9GnM.ttf"
+ }
+]

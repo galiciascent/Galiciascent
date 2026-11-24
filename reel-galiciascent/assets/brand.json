@@ -1,0 +1,226 @@
+{
+ "url": "https://galiciascent.com",
+ "title": "Galicia Scent | Perfumes árabes originales y decants",
+ "description": "Perfumes árabes originales Lattafa, Armaf y Rasasi, y decants de 5 y 10 ml para probar antes de comprar. Envío gratis a España.",
+ "themeColor": [
+  "rgb(255 255 255)"
+ ],
+ "text_colors": [
+  [
+   "#1a1410",
+   64
+  ],
+  [
+   "#8a5a22",
+   36
+  ],
+  [
+   "#7a7068",
+   19
+  ],
+  [
+   "#f0e6d6",
+   6
+  ],
+  [
+   "#0c0907",
+   3
+  ],
+  [
+   "#6b625a",
+   3
+  ],
+  [
+   "#ffffff",
+   3
+  ],
+  [
+   "#e3aa64",
+   2
+  ]
+ ],
+ "background_colors": [
+  [
+   "#f4f0ea",
+   176
+  ],
+  [
+   "#ffffff",
+   108
+  ],
+  [
+   "#0c0907",
+   20
+  ],
+  [
+   "#f7f2ea",
+   20
+  ],
+  [
+   "#1a1410",
+   19
+  ],
+  [
+   "#e3aa64",
+   6
+  ],
+  [
+   "#f0e6d6",
+   1
+  ]
+ ],
+ "font_families": [
+  [
+   "Inter",
+   113
+  ],
+  [
+   "Cormorant Garamond",
+   27
+  ],
+  [
+   "Playfair Display",
+   5
+  ],
+  [
+   "Arial",
+   4
+  ]
+ ],
+ "font_weights": [
+  [
+   "Inter 400",
+   98
+  ],
+  [
+   "Cormorant Garamond 400",
+   24
+  ],
+  [
+   "Inter 500",
+   5
+  ],
+  [
+   "Inter 600",
+   5
+  ],
+  [
+   "Inter 700",
+   5
+  ],
+  [
+   "Playfair Display 400",
+   4
+  ],
+  [
+   "Arial 400",
+   4
+  ],
+  [
+   "Cormorant Garamond 500",
+   3
+  ],
+  [
+   "Playfair Display 500",
+   1
+  ]
+ ],
+ "css_vars": {
+  "--hover-transition-duration": ".25s",
+  "--hover-transition-timing": "ease-out",
+  "--submenu-animation-speed": ".36s",
+  "--safe-area-inset-top": "env(safe-area-inset-top, 0px)",
+  "--safe-area-inset-right": "env(safe-area-inset-right, 0px)",
+  "--safe-area-inset-bottom": "env(safe-area-inset-bottom, 0px)",
+  "--safe-area-inset-left": "env(safe-area-inset-left, 0px)",
+  "--sidebar-width": "25rem",
+  "--theme-drawer-width": "30rem",
+  "--narrow-content-width": "36rem",
+  "--normal-content-width": "42rem",
+  "--narrow-page-width": "90rem",
+  "--normal-page-width": "120rem",
+  "--wide-page-width": "150rem",
+  "--section-height-small": "15rem",
+  "--section-height-medium": "25rem",
+  "--section-height-large": "35rem",
+  "--color-background": "#FFFFFF",
+  "--color-background-rgb": "255 255 255",
+  "--color-foreground": "#1A1410",
+  "--color-foreground-rgb": "26 20 16",
+  "--color-border": "#1A1410",
+  "--color-border-rgb": "26 20 16",
+  "--palette-lightest": "#FFFFFF",
+  "--palette-lightest-rgb": "255 255 255",
+  "--palette-darkest": "#1A1410",
+  "--palette-darkest-rgb": "26 20 16",
+  "--opacity-5-15": "0.05",
+  "--opacity-10-25": "0.1",
+  "--opacity-35-55": "0.35",
+  "--opacity-40-60": "0.4",
+  "--opacity-30-60": "0.3",
+  "--opacity-60": "0.6",
+  "--color-primary-button-text": "rgb(255 255 255 / 1.0)",
+  "--color-primary-button-background": "rgb(26 20 16 / 1.0)",
+  "--color-primary-button-border": "rgb(26 20 16 / 1.0)",
+  "--color-primary-button-focus-outline": "rgb(26 20 16)",
+  "--color-primary-button-hover-text": "rgb(255 255 255 / 1.0)",
+  "--color-primary-button-hover-background": "#49382d",
+  "--color-primary-button-hover-border": "#49382d",
+  "--color-secondary-button-text": "rgb(26 20 16 / 1.0)",
+  "--color-secondary-button-background": "rgb(0 0 0 / 0.0)",
+  "--color-secondary-button-border": "rgb(26 20 16 / 1.0)",
+  "--color-secondary-button-hover-text": "rgb(26 20 16 / 1.0)",
+  "--color-secondary-button-hover-background": "rgba(0, 0, 0, 0.15)",
+  "--color-secondary-button-hover-border": "#49382d",
+  "--color-input-background": "rgb(255 255 255 / 1.0)",
+  "--color-input-text": "rgb(26 20 16 / 1.0)",
+  "--color-input-text-rgb": "26 20 16",
+  "--color-input-border": "rgb(207 197 184 / 1.0)",
+  "--color-variant-background": "rgb(255 255 255 / 1.0)",
+  "--color-variant-border": "rgb(207 197 184 / 1.0)",
+  "--color-variant-text": "rgb(26 20 16 / 1.0)",
+  "--color-variant-text-rgb": "26 20 16",
+  "--color-variant-hover-background": "#f2f2f2",
+  "--color-variant-hover-text": "rgb(26 20 16 / 1.0)",
+  "--color-variant-hover-border": "#c5b9a9",
+  "--color-selected-variant-background": "rgb(26 20 16 / 1.0)",
+  "--color-selected-variant-border": "rgb(26 20 16 / 1.0)",
+  "--color-selected-variant-text": "rgb(255 255 255 / 1.0)",
+  "--color-selected-variant-text-rgb": "255 255 255",
+  "--color-selected-variant-hover-background": "#49382d",
+  "--color-selected-variant-hover-text": "rgb(255 255 255 / 1.0)",
+  "--color-selected-variant-hover-border": "#49382d",
+  "--input-disabled-background-color": "rgb(var(--color-foreground-rgb) / var(--opacity-10))",
+  "--input-disabled-border-color": "rgb(var(--color-foreground-rgb) / var(--opacity-5-15))",
+  "--input-disabled-text-color": "rgb(var(--color-foreground-rgb) / var(--opacity-50))",
+  "--color-foreground-muted": "rgb(var(--color-rgb, var(--color-foreground-rgb)) / var(--opacity-muted-text))",
+  "--color-foreground-subdued": "rgb(var(--color-rgb, var(--color-foreground-rgb)) / var(--opacity-subdued-text))",
+  "--color-drawer-shadow-rgb": "",
+  "--color-popover-shadow-rgb": "26 20 16",
+  "--shadow-blur": "20px",
+  "--shadow-popover": "0px 4px 20px rgb(var(--color-popover-shadow-rgb) / var(--opacity-15))",
+  "--text-align-default": "start",
+  "--shopify-chat-bg-color": "#15100B",
+  "--shopify-chat-text-color": "#F0E6D6",
+  "--shopify-chat-accent-bg-color": "#F0E6D6",
+  "--shopify-chat-accent-text-color": "#15100B",
+  "--shopify-chat-activator-offset": "20px",
+  "--shopify-chat-activator-font-size": "13px",
+  "--shopify-chat-border-radius": "16px",
+  "--jdgm-primary-color": "#108474",
+  "--jdgm-secondary-color": "rgba(16,132,116,0.1)",
+  "--jdgm-star-color": "#108474",
+  "--jdgm-write-review-text-color": "white",
+  "--jdgm-write-review-bg-color": "#108474",
+  "--jdgm-paginate-color": "#108474",
+  "--jdgm-border-radius": "0",
+  "--jdgm-reviewer-name-color": "#108474"
+ },
+ "wordmark": {
+  "text": "Inicio",
+  "font": "Inter, sans-serif",
+  "weight": "400",
+  "tracking": "normal",
+  "html": "\n                    <span class=\"menu-drawer__menu-item-text wrap-text\">Inicio</span>\n                  "
+ }
+}
