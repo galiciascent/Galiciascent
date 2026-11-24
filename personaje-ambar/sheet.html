@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Display; src: url(fonts/display-italic.ttf); font-style: italic; font-weight: 400 900; }
+@font-face { font-family: Display; src: url(fonts/display.ttf); font-weight: 400 900; }
+@font-face { font-family: UI; src: url(fonts/ui-bold.woff2); font-weight: 700; }
+body{margin:0;background:#0C0907}</style></head><body><canvas id="c" width="2400" height="1100"></canvas>
+<script type="module">
+import { drawAmbar } from './ambar.js';
+await document.fonts.load('italic 600 44px Display'); await document.fonts.load('700 40px UI');
+const c = document.getElementById('c').getContext('2d');
+c.fillStyle='#0C0907'; c.fillRect(0,0,2400,1100);
+const g=c.createRadialGradient(1200,500,100,1200,550,1300); g.addColorStop(0,'rgba(227,170,100,0.18)'); g.addColorStop(1,'rgba(227,170,100,0)'); c.fillStyle=g; c.fillRect(0,0,2400,1100);
+const poses = [
+ ['Neutral', {}],
+ ['Hablando', { mouth:{open:0.7, smile:0.5}, armL:[0.5,0.9], armR:[0.2,0.2], brow:0.3 }],
+ ['¡Emocionado!', { happy:1, mouth:{open:0.9, wide:0.6, smile:1}, armL:[2.3,0.3], armR:[2.3,0.3], handL:'wave', handR:'wave', hop:30, squash:-0.08, blush:1 }],
+ ['¡Tú!', { armR:[1.5,0.0], handR:'point', lookX:0.6, brow:0.8, mouth:{open:0.35, smile:0.7}, lean:0.06 }],
+ ['¡Corre!', { sweat:1, brow:-0.8, browUp:1, mouth:{open:0.8, round:0.9, smile:-0.3}, armL:[1.2,1.2], armR:[1.0,1.4], slosh:0.3, lean:-0.1 }],
+ ['Guiño', { wink:1, mouth:{smile:0.9}, armR:[2.6,1.6], handR:'wave', blush:0.6 }],
+];
+poses.forEach(([name,S],i)=>{
+  const x=210+i*396, y=900;
+  c.save(); c.translate(x,y); c.scale(0.95,0.95); drawAmbar(c,{t:i*0.7,...S}); c.restore();
+  c.fillStyle='#E3AA64'; c.font='700 34px UI'; c.textAlign='center'; c.letterSpacing='4px'; c.fillText(name.toUpperCase(),x,1010);
+});
+window.done=true;
+</script></body></html>
