@@ -1,4 +1,4 @@
-// La Meiga de Galicia Scent: a Galician perfume witch, drawn in code. Pure: same S, same pixels.
+// El Meigo de Galicia Scent: a Galician perfume wizard (male), drawn in code. Pure: same S, same pixels.
 // drawMeiga(ctx, S) paints in MODEL units: feet on y = 0, centre x = 0, +y down; hat tip ~ -860.
 // Returns canvas-space points { nozzle: [x, y], mouth: [x, y], hatTip: [x, y] } for effects and bubbles.
 // S (all optional):
@@ -115,7 +115,7 @@ function face(ctx, S) {
       }
     }
     const by = ey - 52 - browUp * 16;
-    ctx.strokeStyle = PAL.hairDark; ctx.lineWidth = 8; ctx.lineCap = 'round';
+    ctx.strokeStyle = PAL.hairDark; ctx.lineWidth = 13; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(ex - side * 22, by + brow * 10); ctx.quadraticCurveTo(ex, by - 8, ex + side * 24, by - brow * 6); ctx.stroke();
   }
   if (blush > 0) {
@@ -151,15 +151,21 @@ export function drawMeiga(ctx, S = {}) {
   cloak(ctx, t, lean * 4);
   // hair behind the head
   ctx.fillStyle = PAL.hair;
-  const hs = Math.sin(t * 2.6) * 0.04;
-  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 122, -400, 52, 118, s * (0.2 + hs), 0, TAU); ctx.fill(); }
+  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 128, -470, 30, 58, s * 0.1, 0, TAU); ctx.fill(); }
   // left arm behind? keep both in front for readability
   // head
   ctx.beginPath(); ctx.arc(0, -450, 140, 0, TAU); ctx.fillStyle = PAL.skin; ctx.fill(); ctx.strokeStyle = PAL.ink; ctx.lineWidth = 6; ctx.stroke();
   // fringe
   ctx.fillStyle = PAL.hair;
-  ctx.beginPath(); ctx.moveTo(-136, -480); ctx.quadraticCurveTo(-90, -600, 0, -590); ctx.quadraticCurveTo(90, -600, 136, -480);
-  ctx.quadraticCurveTo(70, -540, 10, -520); ctx.quadraticCurveTo(-60, -545, -136, -480); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-140, -470); ctx.quadraticCurveTo(-120, -585, 0, -592); ctx.quadraticCurveTo(120, -585, 140, -470);
+  ctx.lineTo(118, -505); ctx.lineTo(96, -488); ctx.lineTo(70, -528); ctx.lineTo(40, -500); ctx.lineTo(8, -540); ctx.lineTo(-24, -505);
+  ctx.lineTo(-58, -532); ctx.lineTo(-84, -496); ctx.lineTo(-112, -520); ctx.closePath(); ctx.fill();
+  // short trimmed beard framing the jaw, drawn under the mouth line
+  ctx.save(); ctx.beginPath(); ctx.arc(0, -450, 140, 0, TAU); ctx.clip();
+  ctx.fillStyle = PAL.hair;
+  ctx.beginPath(); ctx.moveTo(-140, -440); ctx.quadraticCurveTo(-120, -330, 0, -306); ctx.quadraticCurveTo(120, -330, 140, -440);
+  ctx.quadraticCurveTo(110, -360, 60, -372); ctx.quadraticCurveTo(0, -352, -60, -372); ctx.quadraticCurveTo(-110, -360, -140, -440); ctx.fill();
+  ctx.restore();
   face(ctx, S);
   out.mouth = pt(ctx, 0, -380);
   // hat
