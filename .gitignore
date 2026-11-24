@@ -4,3 +4,5 @@ out/
 personaje-ambar/voces/*meigo*
 reel-meiga-*/audio/vo*.wav
 reel-meiga-*/audio/mix.wav
+reel-meigo-*/audio/vo*
+reel-meigo-*/audio/mix.wav
