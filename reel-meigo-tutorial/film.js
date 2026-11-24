@@ -65,8 +65,13 @@ function card(ctx, img, x, y, w, rot, v, v0, out = null, label = null, price = n
   rrect(ctx, -w / 2 - 8, -w / 2 - 8, w + 16, w + 16 + lh, 18); ctx.fillStyle = C.paper; ctx.fill(); ctx.shadowColor = 'transparent';
   cover(ctx, img, -w / 2, -w / 2, w, w, { radius: 12 });
   if (label) text(ctx, label, 0, w / 2 + lh * 0.62, dfont(w * 0.12), C.coal, 'center');
-  if (price) { ctx.save(); ctx.font = ufont(32); const pw = ctx.measureText(price).width + 50; ctx.translate(w / 2 - pw / 2 + 30, -w / 2 + 10); ctx.rotate(0.12); rrect(ctx, -pw / 2, -34, pw, 68, 34); ctx.fillStyle = C.gold; ctx.fill();
-    text(ctx, price, 0, 13, ufont(32), C.night, 'center', 1); ctx.restore(); }
+  if (price) {
+    // [normal, Black Friday]: the normal price struck through above the -20 % price
+    const [old, now] = price; ctx.save(); ctx.font = ufont(38); const pw = Math.max(ctx.measureText(now).width, 120) + 56;
+    ctx.translate(w / 2 - pw / 2 + 30, -w / 2 + 16); ctx.rotate(0.12); rrect(ctx, -pw / 2, -50, pw, 104, 30); ctx.fillStyle = C.gold; ctx.fill();
+    ctx.font = ufont(24, 500); const ow = ctx.measureText(old).width; text(ctx, old, 0, -14, ufont(24, 500), 'rgba(26,20,16,0.7)', 'center');
+    ctx.strokeStyle = '#B23A2A'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-ow / 2 - 4, -22); ctx.lineTo(ow / 2 + 4, -22); ctx.stroke();
+    text(ctx, now, 0, 32, ufont(38), C.night, 'center', 1); ctx.restore(); }
   ctx.restore();
 }
 // gold badge with up to 3 lines, pops with a bounce, tilted
@@ -234,8 +239,7 @@ function vie2(ctx, v, t, IMG) {
   rise(ctx, [['en ', false, C.cream], ['decants', true, C.cream]], 110, CX, 700, v, 7.42, [8.0, 8.3]);
   const P = [[IMG.yara, 'Yara Elixir', 290, 420, -0.07, 8.22, [-500, 0]], [IMG.eclaire, 'Éclaire', 700, 420, 0.06, 9.52, [500, 0]], [IMG.mayar, 'Mayar', 290, 800, 0.05, 10.0, [-500, 0]], [IMG.odyssey, 'Odyssey Mega', 700, 800, -0.06, 10.54, [500, 0]]];
   const hop = 30 * Math.max(0, wobble((v - 11.46) / 0.5, 2, 4));
-  P.forEach(([img, n, x, y, r, v0, from]) => card(ctx, img, x, y - (v > 11.46 ? hop : 0), 280, r, v, v0, [12.0, 12.35], n, '5,49 €', from));
-  caps(ctx, 'DECANTS DESDE 5,49 €', CX, 1060, 38, C.gold, v, 10.8, [12.0, 12.3]);
+  P.forEach(([img, n, x, y, r, v0, from]) => card(ctx, img, x, y - (v > 11.46 ? hop : 0), 280, r, v, v0, [12.0, 12.35], n, ['5,49 €', '4,39 €'], from));
   card(ctx, IMG.decantAfeef, CX, 520, 440, -0.04, v, 12.3, [14.5, 14.8], null, null, [0, 400]);
   pill(ctx, '+ DECANT DE REGALO CON TU FRASCO', CX, 820, v, 13.4, [14.5, 14.8], { fs: 30 });
   rise(ctx, [['Hasta el ', false, C.cream], ['lunes 30', true, C.gold]], 120, CX, 560, v, 14.7, [15.7, 15.9]);
@@ -280,15 +284,16 @@ function sab2(ctx, v, t, IMG) {
     rise(ctx, [['¿Ya?', true, C.gold]], 160, CX, 960, v, 3.64, [4.6, 4.9]);
   }
   const blocks = [
-    [4.98, 10.2, IMG.yara, 'DULCE', 'Yara Elixir', '5,49 €', [['FRESA', 7.16], ['VAINILLA', 7.84], ['CARAMELO', 8.72]], '¡Una delicia!', 9.18],
-    [10.28, 15.95, IMG.decantOdyssey, 'FRESCO', 'Odyssey Mega', '5,49 €', [['NARANJA', 12.32], ['JENGIBRE', 13.0], ['MENTA', 13.9]], 'Para el día a día', 14.22],
-    [16.04, 21.0, IMG.decantFahad, 'INTENSO', 'Fahad', '6,99 €', [['PIMIENTA NEGRA', 18.0], ['INCIENSO', 18.84], ['PACHULÍ', 19.72]], 'Pura elegancia', 20.2],
+    [4.98, 10.2, IMG.yara, 'DULCE', 'Yara Elixir', ['5,49 €', '4,39 €'], [['FRESA', 7.16], ['VAINILLA', 7.84], ['CARAMELO', 8.72]], '¡Una delicia!', 9.18],
+    [10.28, 15.95, IMG.decantOdyssey, 'FRESCO', 'Odyssey Mega', ['5,49 €', '4,39 €'], [['NARANJA', 12.32], ['JENGIBRE', 13.0], ['MENTA', 13.9]], 'Para el día a día', 14.22],
+    [16.04, 21.0, IMG.decantFahad, 'INTENSO', 'Fahad', ['6,99 €', '5,59 €'], [['PIMIENTA NEGRA', 18.0], ['INCIENSO', 18.84], ['PACHULÍ', 19.72]], 'Pura elegancia', 20.2],
   ];
   blocks.forEach(([a, b, img, tag, name, price, notes, quip, qv]) => {
     if (v < a - 0.1 || v > b + 0.4) return;
     const out = [b - 0.15, b + 0.25];
     pill(ctx, 'SI ERES ' + tag, CX, 250, v, a, out, { fs: 30 });
-    card(ctx, img, 400, 600, 470, -0.04, v, a + 0.3, out, name, 'DESDE ' + price, [0, 500]);
+    card(ctx, img, 400, 600, 470, -0.04, v, a + 0.3, out, name, price, [0, 500]);
+    caps(ctx, 'DECANT 5 ML · PRECIO CON EL -20 %', 400, 960, 28, C.gold, v, a + 0.8, out);
     notes.forEach(([n, nv], i) => chip(ctx, n, 840, 430 + i * 120, v, nv, out));
     if (qv) rise(ctx, [[quip, true, C.gold]], 76, CX, 1010, v, qv, out);
   });
