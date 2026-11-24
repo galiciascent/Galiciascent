@@ -90,7 +90,7 @@ function card(ctx, img, x, y, w, rot, u, u0, out = null, label = null) {
 // [u0, u1, lines]; syllables are voiced by 'tok' hits and drive the mouth.
 const LINES = {
   vie: [[0.4, 3.7, ['¡Eh, tú!']], [14, 19.6, ['¡Y con tu frasco,', 'un decant de regalo!']]],
-  sab: [[0.3, 3.9, ['¿No sabes qué', 'perfume elegir?']], [12, 15.8, ['¡Pruébalos', 'antes!']]],
+  sab: [[0.3, 3.9, ['¿No sabes qué', 'perfume elegir?']], [11.8, 15.6, ['¡Pruébalos', 'antes!']]],
   dom: [[0.8, 3.9, ['¡Corre, corre!']], [16, 19.4, ['¿A qué', 'esperas?']], [19.8, 23.4, ['¡Entra en', 'galiciascent.com!']]],
 }[DAY];
 const sylCount = (s) => Math.max(1, (s.toLowerCase().match(/[aeiouáéíóú]+/g) || []).length);
@@ -103,6 +103,9 @@ LINES.forEach(([u0, u1, lines]) => {
 const PITCH = ['E5', 'G5', 'A5', 'B5', 'D6', 'E6'];
 const VOICE = SYL.map((u, i) => [u, 'voz', 'tok', { pitch: PITCH[Math.floor(hash01(i, 5) * PITCH.length)], gain: 0.22 }]);
 const talk = (u) => SYL.reduce((m, s) => Math.max(m, bump(u, s + 0.09, 0.16)), 0);
+// The recorded voice (audio/vo.wav) drives the mouth through vo_env.json (RMS at 60 fps) when present.
+let VOENV = null;
+const voice = (t) => (VOENV ? VOENV[Math.max(0, Math.min(VOENV.length - 1, Math.round(t * 60)))] || 0 : 0);
 
 function bubble(ctx, [u0, u1, lines], u, mouth) {
   const k = springU(u, u0, SPRING.bouncy) * (1 - E.inBack(prog(u, u1 - 0.3, u1)));
@@ -118,7 +121,7 @@ function bubble(ctx, [u0, u1, lines], u, mouth) {
   ctx.fillStyle = C.paper;
   rrect(ctx, bx, by, bw, bh, 38); ctx.fill();
   // tail toward the mouth
-  ctx.beginPath(); ctx.moveTo(ax - 40, ay - 4); ctx.quadraticCurveTo(ax + 40, ay + 60, mouth[0] - 60, mouth[1] - 40); ctx.quadraticCurveTo(ax + 50, ay + 10, ax + 30, ay - 4); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(ax - 40, ay - 4); ctx.quadraticCurveTo(ax + 40, ay + 60, mouth[0] - 46, mouth[1] - 4); ctx.quadraticCurveTo(ax + 50, ay + 10, ax + 30, ay - 4); ctx.closePath(); ctx.fill();
   ctx.shadowColor = 'transparent';
   lines.forEach((l, i) => text(ctx, l, bx + 40, by + 40 + lh * (i + 0.75), ufont(fs, 700), C.coal, 'left'));
   ctx.restore();
@@ -206,6 +209,11 @@ function pose(u, t) {
 }
 function meiga(ctx, u, t) {
   const { S, x } = pose(u, t);
+  if (VOENV) {
+    const v = voice(t);
+    if (v > 0.06) S.mouth = { open: Math.min(1, v * 0.9), round: 0.3 + 0.3 * Math.sin(t * 23), smile: S.happy ? 0.9 : 0.5 };
+    else if (!S.happy && (S.mouth.open || 0) > 0.3 && u < 23.5) S.mouth = { ...S.mouth, open: 0.15 };
+  }
   ctx.save(); ctx.translate(x, FEET); ctx.scale(MS, MS);
   const out = drawMeiga(ctx, S);
   ctx.restore();
@@ -231,7 +239,7 @@ function zoneSab(ctx, u, IMG) {
   pill(ctx, 'BLACK FRIDAY · ESTE FINDE', 300, u, 16, [23, 23.5]);
   bigDrop(ctx, [['-20', false, C.gold], [' %', true, C.gold]], 300, 640, u, 16.6, [23, 23.5]);
   riseLine(ctx, [['en ', false, C.cream], ['decants', true, C.cream]], 110, CX, 780, u, 17.6, [23, 23.4]);
-  caps(ctx, 'IDEALES PARA REGALAR EN NAVIDAD', CX, 870, 34, C.gold, u, 19, [23, 23.4]);
+  caps(ctx, 'IDEALES PARA REGALAR EN NAVIDAD', CX, 870, 34, C.gold, u, 20, [23, 23.4]);
 }
 function zoneDom(ctx, u, IMG) {
   riseLine(ctx, [['¡El Black Friday', false, C.cream]], 110, CX, 400, u, 4, [9.4, 9.9]);
@@ -258,7 +266,7 @@ function endCard(ctx, u, IMG) {
 
 // ---------------------------------------------------------------- hits
 const COMMON = [[23.6, 'end card', 'impact', { gain: 0.5 }], [24.2, 'web', 'bell', { pitch: 'E6' }]];
-const HITS = [...VOICE, ...COMMON, ...{
+const HITS = [...COMMON, ...{
   vie: [[0, 'pop up', 'boing', { pitch: 'C5', to: 'C6' }], [4.1, 'spray', 'whoosh', { len: 0.6, from: 3000, to: 900 }], [5, 'pill', 'click'], [5.5, 'hoy empieza', 'pop', { pitch: 'A5' }],
     [6, 'jump', 'boing', { pitch: 'E5', to: 'E6', gain: 0.18 }], [7.6, 'jump', 'boing', { pitch: 'G5', to: 'G6', gain: 0.16 }], [10, '-20 %', 'impact'], [11.4, 'en decants', 'pop', { pitch: 'E5' }],
     [12, 'wink', 'blip', { pitch: 'E6' }], [14.2, 'card', 'thud'], [15.4, 'regalo', 'coins'], [20.1, 'spray', 'whoosh', { len: 0.6, from: 3000, to: 900 }], [23.2, 'into end', 'riser', { len: 0.4 }]],
@@ -280,6 +288,7 @@ M.film({
   },
   hits: HITS,
   async init() {
+    try { const r = await fetch('vo_env.json'); if (r.ok) VOENV = await r.json(); } catch {}
     const r = mulberry32(42);
     STARS = Array.from({ length: 70 }, () => [r() * W, r() * 1500, 1 + r() * 2.5, r() * 6]);
     const gc = document.createElement('canvas'); gc.width = 256; gc.height = 256;

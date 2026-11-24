@@ -2,4 +2,5 @@ out/
 
 # Audios con la voz clonada del dueño: no se publican (el repositorio es público)
 personaje-ambar/voces/*meigo*
-reel-meigo-*/audio/vo*.wav
+reel-meiga-*/audio/vo*.wav
+reel-meiga-*/audio/mix.wav
