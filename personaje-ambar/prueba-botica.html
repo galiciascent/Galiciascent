@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: Display; src: url(fonts/display-italic.ttf); font-style: italic; font-weight: 400 900; }
+@font-face { font-family: Display; src: url(fonts/display.ttf); font-weight: 400 900; }
+@font-face { font-family: UI; src: url(fonts/ui-bold.woff2); font-weight: 700; }
+body{margin:0;background:#000}</style></head><body><canvas id="c" width="3300" height="1920"></canvas>
+<script type="module">
+import { drawMeiga } from './meiga.js';
+await document.fonts.load('italic 600 44px Display'); await document.fonts.load('600 44px Display'); await document.fonts.load('700 40px UI');
+const load = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+const bg = await load('assets/fondos/botica.png'), cedrus = await load('assets/products/frasco-rayhaan-cedrus-blanc.jpg'), yara = await load('assets/products/decant-yara.jpg');
+const c = document.getElementById('c').getContext('2d');
+const S = 1920 * 1.06 / 2048;           // background scale so the floor sits low
+const frames = [[1500, 'hook'], [5250, 'producto'], [3200, 'mostrador']];
+frames.forEach(([cx, kind], i) => {
+  c.save(); c.translate(i * 1100, 0); c.beginPath(); c.rect(0, 0, 1080, 1920); c.clip();
+  c.drawImage(bg, cx - 540 / S, 0, 1080 / S, 2048, 0, -40, 1080, 2048 * S);
+  // warm vignette for depth
+  const g = c.createRadialGradient(540, 900, 300, 540, 960, 1300); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(20,10,5,0.45)'); c.fillStyle = g; c.fillRect(0, 0, 1080, 1920);
+  // wooden hanging sign for text
+  const sign = (txt, sub, y) => { c.save(); c.translate(540, y); c.rotate(-0.02);
+    c.strokeStyle = '#3B2414'; c.lineWidth = 6; c.beginPath(); c.moveTo(-300, -140); c.lineTo(-260, -60); c.moveTo(300, -140); c.lineTo(260, -60); c.stroke();
+    c.fillStyle = '#6B3F1F'; c.beginPath(); c.roundRect(-420, -70, 840, 190, 26); c.fill(); c.strokeStyle = '#E3AA64'; c.lineWidth = 8; c.stroke();
+    c.fillStyle = '#F0E6D6'; c.font = 'italic 600 92px Display'; c.textAlign = 'center'; c.fillText(txt, 0, 40);
+    if (sub) { c.fillStyle = '#E3AA64'; c.font = '700 34px UI'; c.letterSpacing = '6px'; c.fillText(sub, 0, 100); c.letterSpacing = '0px'; }
+    c.restore(); };
+  if (kind === 'hook') sign('¿Ya sabes cuál?', 'TU PERFUME TE ESPERA', 330);
+  if (kind === 'producto') { sign('Cedrus Blanc', 'CEDRO · BERGAMOTA · AZAHAR', 300);
+    c.save(); c.translate(560, 820); c.rotate(-0.03); c.shadowColor = 'rgba(0,0,0,0.5)'; c.shadowBlur = 40; c.fillStyle = '#F4F0EA'; c.fillRect(-250, -250, 500, 500); c.shadowColor = 'transparent'; c.drawImage(cedrus, -235, -235, 470, 470);
+      c.fillStyle = '#E3AA64'; c.beginPath(); c.roundRect(130, -290, 200, 76, 38); c.fill(); c.fillStyle = '#0C0907'; c.font = '700 38px UI'; c.textAlign = 'center'; c.fillText('32,99 €', 230, -238); c.restore(); }
+  if (kind === 'mostrador') { sign('¡Decant de regalo!', 'CON CADA FRASCO', 320);
+    c.save(); c.translate(540, 860); c.rotate(0.04); c.shadowColor = 'rgba(0,0,0,0.5)'; c.shadowBlur = 40; c.fillStyle = '#F4F0EA'; c.fillRect(-200, -200, 400, 400); c.shadowColor = 'transparent'; c.drawImage(yara, -188, -188, 376, 376); c.restore(); }
+  // Meigo walking on the floor, with a soft shadow
+  c.fillStyle = 'rgba(0,0,0,0.3)'; c.beginPath(); c.ellipse(kind === 'hook' ? 540 : 840, 1640, 170, 30, 0, 0, 7); c.fill();
+  c.save(); c.translate(kind === 'hook' ? 540 : 840, 1640); c.scale(kind === 'hook' ? 0.75 : 0.62, kind === 'hook' ? 0.75 : 0.62);
+  drawMeiga(c, { t: i, step: kind === 'mostrador' ? 0.25 : null, armL: kind === 'hook' ? [1.4, 0.1] : [2.3, 0.3], handL: kind === 'hook' ? 'point' : 'open', happy: kind !== 'hook' ? 1 : 0, mouth: { open: 0.5, smile: 0.8 } });
+  c.restore(); c.restore();
+});
+window.done = true;
+</script></body></html>
