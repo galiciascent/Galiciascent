@@ -27,6 +27,7 @@ function rise(ctx, segs, size, x, base, v, v0, out = null, align = 'center') {
   const L = richLayout(ctx, segs, size); const x0 = align === 'center' ? x - L.width / 2 : x;
   if (out && v > out[1] + 0.3) return;
   ctx.save(); ctx.beginPath(); ctx.rect(0, base - size * 1.25, W, size * 1.65); ctx.clip();
+  ctx.shadowColor = 'rgba(15,8,4,0.9)'; ctx.shadowBlur = size * 0.22; ctx.shadowOffsetY = size * 0.04;
   L.glyphs.forEach((g, j) => {
     const k = sp(v, v0 + j * 0.018); if (k <= 0) return;
     let y = base + (1 - k) * size * 1.1;
@@ -37,7 +38,7 @@ function rise(ctx, segs, size, x, base, v, v0, out = null, align = 'center') {
 }
 function caps(ctx, str, x, y, size, color, v, v0, out = null, track = 0.24, align = 'center') {
   let k = E.outCubic(pr(v, v0, v0 + 0.3)); if (out) k *= 1 - pr(v, out[0], out[1]); if (k <= 0) return;
-  ctx.save(); ctx.globalAlpha = k; text(ctx, str, x, y + (1 - k) * 14, ufont(size), color, align, size * track); ctx.restore();
+  ctx.save(); ctx.globalAlpha = k; ctx.shadowColor = 'rgba(15,8,4,0.95)'; ctx.shadowBlur = 16; text(ctx, str, x, y + (1 - k) * 14, ufont(size), color, align, size * track); ctx.restore();
 }
 function pill(ctx, label, cx, y, v, v0, out = null, { fs = 36, bg = C.gold, fg = C.night } = {}) {
   let k = sp(v, v0, SP.snappy); if (out) k *= 1 - E.inBack(pr(v, out[0], out[1])); if (k <= 0.01) return;
@@ -53,6 +54,7 @@ function drop(ctx, segs, size, cx, y, v, v0, out = null) {
   const q = 0.06 * wobble((v - v0) / 0.536, 2.4, 5); let dy = -(1 - k) * 460, a = clamp(k * 2);
   if (out) { const o = E.inBack(pr(v, out[0], out[1]), 1.3); dy += o * 900; }
   ctx.save(); ctx.globalAlpha = a; ctx.translate(cx, y); ctx.scale(1 + q, 1 - q); ctx.translate(-cx, -y);
+  ctx.shadowColor = 'rgba(15,8,4,0.9)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 10;
   const L = richLayout(ctx, segs, size); L.glyphs.forEach((g) => glyph(ctx, g.ch, cx - L.width / 2 + g.cx, y + dy, g.f, g.col)); ctx.restore();
 }
 function card(ctx, img, x, y, w, rot, v, v0, out = null, label = null, price = null, from = [0, 300]) {
@@ -113,13 +115,31 @@ function flash(ctx, v, v0) { const a = 0.55 * (1 - pr(v, v0, v0 + 0.35)); if (v 
 function shake(ctx, v, v0, amp = 18) { const d = v - v0; if (d < 0 || d > 0.4) return; const k = amp * (1 - d / 0.4); ctx.translate(Math.sin(d * 90) * k, Math.cos(d * 70) * k); }
 
 // ---------------------------------------------------------------- background
-let STARS = null, GRAIN = null, VOENV = null;
-function backdrop(ctx, t) {
-  fill(ctx, C.night);
-  const g = ctx.createRadialGradient(CX, 700, 60, CX, 800, 1150); g.addColorStop(0, 'rgba(227,170,100,0.20)'); g.addColorStop(1, 'rgba(227,170,100,0)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = C.cream; STARS.forEach(([x, y, r, ph]) => { ctx.globalAlpha = 0.2 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2 + ph)); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); });
-  ctx.globalAlpha = 1;
+let GRAIN = null, VOENV = null;
+// The shop panorama (assets/fondos/botica.png, 8256x2048): the camera walks along it.
+// Landmarks (source x): entrance 0-1030, shelves 1450-3350, counter 3400-4900, pedestals 5160-5930, arches 4750-6450, nook 7020, window 7740.
+const CAMS = {
+  tutorial: [[0, 900], [3.6, 2300], [10.0, 2900], [15.4, 3500], [21.2, 4300], [30.4, 5500], [34.4, 7300]],
+  vie2: [[0, 800], [2.6, 1900], [6.5, 3900], [8.0, 5500], [12.2, 4300], [14.6, 6900], [15.8, 7500]],
+  sab2: [[0, 5600], [4.9, 2500], [10.2, 4100], [15.9, 6900], [20.9, 7450], [26.9, 7700]],
+  dom2: [[0, 900], [1.0, 2400], [4.0, 4000], [7.6, 5500], [14.8, 7400]],
+  frascos: [[0, 2100], [3.8, 3700], [6.8, 5250], [11.1, 5800], [15.6, 6500], [19.4, 7050], [21.5, 7550]],
+}[VID];
+const BGS = 1920 * 1.06 / 2048, BGW = 1080 / BGS;
+function camX(v) {
+  let x = CAMS[0][1];
+  for (let i = 1; i < CAMS.length; i++) { const [k, nx] = CAMS[i]; const e = E.inOutSine(pr(v, k - 0.45, k + 0.85)); x += (nx - CAMS[i - 1][1]) * e; }
+  return Math.max(BGW / 2, Math.min(8256 - BGW / 2, x));
+}
+const camSpeed = (v) => Math.abs(camX(v + 0.05) - camX(v - 0.05)) / 0.1;
+function backdrop(ctx, t, v) {
+  const x = camX(v);
+  ctx.drawImage(IMGS.botica, x - BGW / 2, 0, BGW, 2048, 0, -40, W, 2048 * BGS);
+  // legibility: warm dark veil at the top where the type lives, soft vignette around
+  const g = ctx.createLinearGradient(0, 0, 0, 1250); g.addColorStop(0, 'rgba(18,9,4,0.62)'); g.addColorStop(0.75, 'rgba(18,9,4,0.28)'); g.addColorStop(1, 'rgba(18,9,4,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, 1250);
+  const r = ctx.createRadialGradient(CX, 900, 400, CX, 960, 1250); r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(15,8,4,0.45)');
+  ctx.fillStyle = r; ctx.fillRect(0, 0, W, H);
 }
 
 // ---------------------------------------------------------------- the Meigo
@@ -129,6 +149,10 @@ function meigo(ctx, t, x, feet, s, S) {
   S.t = t; S.blink = S.blink ?? (bump(t % 3.7, 3.5, 0.1));
   if (vv > 0.06) S.mouth = { open: Math.min(1, vv * 0.9), round: 0.3 + 0.3 * Math.sin(t * 23), smile: S.happy ? 0.9 : 0.5 };
   else S.mouth = S.mouth || { open: 0, smile: 0.6 };
+  feet += 160; s *= 1.15;
+  const v = t - LEAD;
+  if (camSpeed(v) > 120 && S.step == null) { S.step = (t * 1.7) % 1; S.lean = (S.lean || 0) + 0.05; }
+  ctx.save(); ctx.fillStyle = 'rgba(20,10,4,0.35)'; ctx.beginPath(); ctx.ellipse(x, feet - 4, 190 * s, 34 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   ctx.save(); ctx.translate(x, feet); ctx.scale(s, s); const out = drawMeigo(ctx, S); ctx.restore(); return out;
 }
 // talking-arm gesture: a little beat while speaking
@@ -137,9 +161,9 @@ function endCard(ctx, v, t, v0, line) {
   const k = sp(v, v0); if (k <= 0) return null;
   const size = 380, y = 270;
   ctx.save(); ctx.globalAlpha = clamp(k * 1.5); ctx.translate(CX, y + size / 2); ctx.scale(lerp(0.8, 1, k), lerp(0.8, 1, k)); ctx.translate(-CX, -(y + size / 2));
-  ctx.beginPath(); ctx.arc(CX, y + size / 2, size * 0.5, 0, Math.PI * 2); ctx.clip(); ctx.globalCompositeOperation = 'screen'; ctx.drawImage(IMGS.logo, CX - size / 2, y, size, size); ctx.restore();
+  ctx.beginPath(); ctx.arc(CX, y + size / 2, size * 0.5, 0, Math.PI * 2); ctx.fillStyle = '#000'; ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 40; ctx.fill(); ctx.shadowColor = 'transparent'; ctx.clip(); ctx.globalCompositeOperation = 'screen'; ctx.drawImage(IMGS.logo, CX - size / 2, y, size, size); ctx.restore();
   rise(ctx, [['galiciascent', false, C.cream], ['.com', true, C.gold]], 96, CX, 760, v, v0 + 0.25);
-  caps(ctx, line, CX, 840, 34, C.gold, v, v0 + 0.6);
+  pill(ctx, line, CX, 800, v, v0 + 0.6, null, { fs: 24 });
   return meigo(ctx, t, CX, 1480, 0.62, { happy: 1, armL: [2.5 + 0.25 * Math.sin(t * 9), 0.5], armR: [0.5, 0.6], blush: 0.6 });
 }
 
@@ -460,19 +484,18 @@ M.film({
   images: {
     c1: 'caps/01-inicio.png', c2: 'caps/02-decants-full.png', c3: 'caps/03-producto-full.png', c6: 'caps/06-carrito.png',
     yara: 'assets/products/yara-elixir.jpg', eclaire: 'assets/products/eclaire.jpg', mayar: 'assets/products/mayar.jpg', odyssey: 'assets/products/odyssey-mega.jpg',
-    decantAfeef: 'assets/products/decant-afeef.jpg', decantOdyssey: 'assets/products/decant-odyssey.jpg', decantFahad: 'assets/products/decant-fahad.jpg', decantYara: 'assets/products/decant-yara.jpg', cedrus: 'assets/products/frasco-rayhaan-cedrus-blanc.jpg', freeze: 'assets/products/frasco-riiffs-freeze-in-flames.jpg', hawas: 'assets/products/frasco-rasasi-hawas-gold-digger.jpg', logo: 'assets/logo/logo.png',
+    decantAfeef: 'assets/products/decant-afeef.jpg', decantOdyssey: 'assets/products/decant-odyssey.jpg', decantFahad: 'assets/products/decant-fahad.jpg', botica: 'assets/fondos/botica.png', decantYara: 'assets/products/decant-yara.jpg', cedrus: 'assets/products/frasco-rayhaan-cedrus-blanc.jpg', freeze: 'assets/products/frasco-riiffs-freeze-in-flames.jpg', hawas: 'assets/products/frasco-rasasi-hawas-gold-digger.jpg', logo: 'assets/logo/logo.png',
   },
   hits: HITS,
   async init(ctx, IMG) {
     IMGS = IMG;
     try { const r = await fetch('vo_env.json'); if (r.ok) VOENV = await r.json(); } catch {}
-    const r = mulberry32(42); STARS = Array.from({ length: 70 }, () => [r() * W, r() * 1500, 1 + r() * 2.5, r() * 6]);
     const gc = document.createElement('canvas'); gc.width = 256; gc.height = 256; const gx = gc.getContext('2d'); const id = gx.createImageData(256, 256); const rnd = mulberry32(11);
     for (let i = 0; i < id.data.length; i += 4) { const q = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = q; id.data[i + 3] = 255; } gx.putImageData(id, 0, 0); GRAIN = gc;
   },
   draw(ctx, u, t, IMG) {
     const v = t - LEAD;
-    backdrop(ctx, t);
+    backdrop(ctx, t, v);
     ({ tutorial, vie2, sab2, dom2, frascos })[VID](ctx, v, t, IMG);
   },
   post(ctx, u, t) {
