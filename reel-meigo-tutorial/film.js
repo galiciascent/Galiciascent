@@ -5,7 +5,7 @@ import * as M from './lib/motion.js';
 import { drawMeiga as drawMeigo } from './meiga.js';
 
 const { W, H, E, prog, lerp, clamp, font, layout, glyph, text, fill, cover, rrect, hash01, mulberry32, bump, wobble } = M;
-const VID = (location.pathname.match(/reel-meigo-(tutorial|vie2|sab2|dom2)/) || [, 'tutorial'])[1];
+const VID = (location.pathname.match(/reel-meigo-(tutorial|vie2|sab2|dom2|frascos)/) || [, 'tutorial'])[1];
 const LEAD = 0.3;
 const C = { night: '#0C0907', coal: '#1A1410', cream: '#F0E6D6', paper: '#F4F0EA', gold: '#E3AA64', goldHi: '#FBE3A8', brown: '#8A5A22', mute: '#7A7068' };
 const DISPLAY = 'Display', UI = 'UI';
@@ -67,11 +67,11 @@ function card(ctx, img, x, y, w, rot, v, v0, out = null, label = null, price = n
   if (label) text(ctx, label, 0, w / 2 + lh * 0.62, dfont(w * 0.12), C.coal, 'center');
   if (price) {
     // [normal, Black Friday]: the normal price struck through above the -20 % price
-    const [old, now] = price; ctx.save(); ctx.font = ufont(38); const pw = Math.max(ctx.measureText(now).width, 120) + 56;
+    const [old, now] = Array.isArray(price) ? price : [null, price]; ctx.save(); ctx.font = ufont(38); const pw = Math.max(ctx.measureText(now).width, 120) + 56;
     ctx.translate(w / 2 - pw / 2 + 30, -w / 2 + 16); ctx.rotate(0.12); rrect(ctx, -pw / 2, -50, pw, 104, 30); ctx.fillStyle = C.gold; ctx.fill();
-    ctx.font = ufont(24, 500); const ow = ctx.measureText(old).width; text(ctx, old, 0, -14, ufont(24, 500), 'rgba(26,20,16,0.7)', 'center');
-    ctx.strokeStyle = '#B23A2A'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-ow / 2 - 4, -22); ctx.lineTo(ow / 2 + 4, -22); ctx.stroke();
-    text(ctx, now, 0, 32, ufont(38), C.night, 'center', 1); ctx.restore(); }
+    if (old) { ctx.font = ufont(24, 500); const ow = ctx.measureText(old).width; text(ctx, old, 0, -14, ufont(24, 500), 'rgba(26,20,16,0.7)', 'center');
+    ctx.strokeStyle = '#B23A2A'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-ow / 2 - 4, -22); ctx.lineTo(ow / 2 + 4, -22); ctx.stroke(); }
+    text(ctx, now, 0, old ? 32 : 14, ufont(38), C.night, 'center', 1); ctx.restore(); }
   ctx.restore();
 }
 // gold badge with up to 3 lines, pops with a bounce, tilted
@@ -377,6 +377,59 @@ function dom2(ctx, v, t, IMG) {
   return meigo(ctx, t, 900, 1480 - hop, 0.5, S);
 }
 
+// ---------------------------------------------------------------- FRASCOS: full bottles + gift decant
+function frascos(ctx, v, t, IMG) {
+  ctx.save(); ctx.translate(0, 90); shake(ctx, v, 1.58, 14); shake(ctx, v, 19.6, 16);
+  // hook: a little decant that grows into a full bottle
+  if (v < 4.0) {
+    const g = E.inOutCubic(pr(v, 1.5, 2.4));
+    const w = lerp(220, 520, g);
+    card(ctx, g < 0.5 ? IMG.decantYara : IMG.cedrus, CX, 560, w, -0.03, v, -0.45, [3.6, 3.95]);
+    rise(ctx, [['¿Ya sabes cuál es ', false, C.cream]], 72, CX, 230, v, -0.4, [1.5, 1.7]);
+    rise(ctx, [['tu perfume?', true, C.gold]], 110, CX, 330, v, 0.1, [1.5, 1.7]);
+    rise(ctx, [['¡Llévatelo ', false, C.cream], ['en grande!', true, C.gold]], 96, CX, 260, v, 1.6, [3.6, 3.95]);
+    pill(ctx, 'FRASCOS COMPLETOS · 100 ML', CX, 920, v, 2.83, [3.6, 3.95]);
+  }
+  // gift: bottle + decant
+  if (v > 3.8 && v < 7.1) {
+    const out = [6.6, 6.95];
+    card(ctx, IMG.cedrus, 360, 560, 400, -0.06, v, 3.9, out, null, null, [-400, 0]);
+    rise(ctx, [['+', true, C.gold]], 160, 640, 620, v, 4.4, out);
+    card(ctx, IMG.decantYara, 830, 560, 240, 0.08, v, 4.8, out, null, null, [400, 0]);
+    pill(ctx, '+ DECANT DE REGALO PARA PROBAR OTRO', CX, 860, v, 5.0, out, { fs: 28 });
+    caps(ctx, 'CON CADA FRASCO · BLACK FRIDAY 27–30 NOV', CX, 260, 30, C.gold, v, 4.0, out);
+  }
+  const blocks = [
+    [6.9, 11.1, IMG.cedrus, 'Cedrus Blanc', '32,99 €', [['CEDRO', 7.72], ['BERGAMOTA', 8.24], ['FLOR DE NARANJO', 9.03]], 'Fresco y elegante', 9.9],
+    [11.19, 15.7, IMG.freeze, 'Freeze in Flames', '37,99 €', [['MARACUYÁ', 12.68], ['FRAMBUESA', 13.3], ['HIERBABUENA', 14.1]], '¡Fuego y hielo!', 14.8],
+    [15.74, 19.5, IMG.hawas, 'Hawas Gold Digger', '41,99 €', [['PERA', 16.9], ['CANELA', 17.38], ['VAINILLA', 18.05]], '¡Puro oro!', 18.76],
+  ];
+  blocks.forEach(([a, b, img, name, price, notes, quip, qv]) => {
+    if (v < a - 0.1 || v > b + 0.4) return;
+    const out = [b - 0.15, b + 0.25];
+    pill(ctx, 'ÚLTIMAS UNIDADES', CX, 240, v, a, out, { fs: 28, bg: '#B23A2A', fg: '#fff' });
+    card(ctx, img, 400, 590, 470, -0.04, v, a + 0.2, out, name, price, [0, 500]);
+    notes.forEach(([n, nv], i) => chip(ctx, n, 840, 430 + i * 120, v, nv, out));
+    rise(ctx, [[quip, true, C.gold]], 76, CX, 1010, v, qv, out);
+  });
+  if (v > 19.4 && v < 21.8) {
+    const out = [21.4, 21.7];
+    [[IMG.cedrus, 230, -0.08, 19.55], [IMG.freeze, 540, 0.04, 19.7], [IMG.hawas, 850, 0.08, 19.85]].forEach(([img, x, r, v0]) => card(ctx, img, x, 560, 280, r, v, v0, out));
+    const k = sp(v, 19.84, SP.bouncy) * (1 - pr(v, out[0], out[1]));
+    if (k > 0.01) { ctx.save(); ctx.translate(CX, 830); ctx.rotate(-0.06); ctx.scale(lerp(2, 1, k), lerp(2, 1, k)); ctx.globalAlpha = clamp(k * 2);
+      rrect(ctx, -330, -70, 660, 140, 24); ctx.fillStyle = '#B23A2A'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; rrect(ctx, -318, -58, 636, 116, 18); ctx.stroke();
+      text(ctx, '¡QUEDAN MUY POCOS!', 0, 18, ufont(52), '#fff', 'center', 2); ctx.restore(); }
+  }
+  ctx.restore();
+  if (v > 21.5) return endCard(ctx, v, t, 21.57, 'FRASCOS + DECANT DE REGALO · 27–30 NOV');
+  const S = { armL: [0.4 + gest(t), 0.6], armR: [0.5 + gest(t + 1), 0.7] };
+  if (v < 1.5) { S.armL = [0.9, 2.3]; S.lookY = -0.6; S.browUp = 0.6; S.lookX = -0.5; }
+  if (v > 1.5 && v < 3.0) { S.happy = 1; S.armL = [2.4, 0.3]; S.armR = [2.0, 0.4]; }
+  if (blocks.some(([, , , , , , , qv]) => v > qv - 0.1 && v < qv + 0.8)) { S.happy = 1; S.armL = [2.3, 0.3]; }
+  if (v > 19.5 && v < 21.5) { S.sweat = 1; S.brow = -0.6; S.browUp = 0.8; S.armL = [2.4, 0.2]; S.armR = [2.3, 0.2]; }
+  return meigo(ctx, t, 900, 1480, 0.5, S);
+}
+
 // ---------------------------------------------------------------- hits (sound), in beats
 const HITS = {
   tutorial: [[0, 'hook', 'boing', { pitch: 'C5', to: 'C6' }], [S2U(3.2), '6 €', 'coins'], [S2U(5.4), 'phone in', 'whoosh', { len: 0.5 }],
@@ -391,6 +444,10 @@ const HITS = {
     ...[7.16, 7.84, 8.72, 12.32, 13.0, 13.9, 18.0, 18.84, 19.72].map((s) => [S2U(s), 'note', 'tick']),
     [S2U(9.18), 'delicia', 'bell', { pitch: 'A5' }], [S2U(14.22), 'dia', 'bell', { pitch: 'B5' }], [S2U(20.2), 'elegancia', 'bell', { pitch: 'E5' }], [S2U(22.1), 'comment', 'pop', { pitch: 'A5' }], [S2U(22.4), 'typing', 'type', { len: 0.6 }],
     [S2U(25.18), '-20', 'impact', { gain: 0.45 }], [S2U(27.0), 'end', 'impact', { gain: 0.5 }]],
+  frascos: [[0, 'hook', 'pop', { pitch: 'C6' }], [S2U(1.58), 'grande', 'impact', { gain: 0.45 }], [S2U(2.83), 'pill', 'click'], [S2U(3.9), 'bottle', 'whoosh', { len: 0.4 }], [S2U(4.8), 'decant', 'whoosh', { len: 0.3 }], [S2U(5.0), 'regalo', 'coins'],
+    ...[6.9, 11.19, 15.74].flatMap((s) => [[S2U(s), 'block', 'whoosh', { len: 0.4 }], [S2U(s + 0.2), 'card', 'thud']]),
+    ...[7.72, 8.24, 9.03, 12.68, 13.3, 14.1, 16.9, 17.38, 18.05].map((s) => [S2U(s), 'note', 'tick']),
+    [S2U(9.9), 'quip', 'bell', { pitch: 'A5' }], [S2U(14.8), 'quip', 'bell', { pitch: 'B5' }], [S2U(18.76), 'oro', 'coins'], [S2U(19.84), 'pocos', 'impact', { gain: 0.5 }], [S2U(21.57), 'end', 'impact', { gain: 0.5 }]],
   dom2: [[0, 'tic', 'tick'], [S2U(0.26), 'tac', 'tick'], [S2U(0.54), 'tic', 'tick'], [S2U(0.64), 'tac', 'tick'], [S2U(1.08), 'acaba', 'impact', { gain: 0.45 }], [S2U(3.1), 'lunes', 'click'],
     [S2U(4.2), '-20', 'impact', { gain: 0.5 }], [S2U(5.6), 'regalo', 'coins'], [S2U(8.0), 'phone', 'whoosh', { len: 0.4 }], [S2U(9.3), 'tap1', 'pop', { pitch: 'C6' }], [S2U(10.5), 'tap2', 'pop', { pitch: 'E6' }], [S2U(11.7), 'tap3', 'pop', { pitch: 'G6' }],
     [S2U(13.4), 'check', 'bell', { pitch: 'E6' }], [S2U(14.86), 'end', 'impact', { gain: 0.5 }]],
@@ -403,7 +460,7 @@ M.film({
   images: {
     c1: 'caps/01-inicio.png', c2: 'caps/02-decants-full.png', c3: 'caps/03-producto-full.png', c6: 'caps/06-carrito.png',
     yara: 'assets/products/yara-elixir.jpg', eclaire: 'assets/products/eclaire.jpg', mayar: 'assets/products/mayar.jpg', odyssey: 'assets/products/odyssey-mega.jpg',
-    decantAfeef: 'assets/products/decant-afeef.jpg', decantOdyssey: 'assets/products/decant-odyssey.jpg', decantFahad: 'assets/products/decant-fahad.jpg', logo: 'assets/logo/logo.png',
+    decantAfeef: 'assets/products/decant-afeef.jpg', decantOdyssey: 'assets/products/decant-odyssey.jpg', decantFahad: 'assets/products/decant-fahad.jpg', decantYara: 'assets/products/decant-yara.jpg', cedrus: 'assets/products/frasco-rayhaan-cedrus-blanc.jpg', freeze: 'assets/products/frasco-riiffs-freeze-in-flames.jpg', hawas: 'assets/products/frasco-rasasi-hawas-gold-digger.jpg', logo: 'assets/logo/logo.png',
   },
   hits: HITS,
   async init(ctx, IMG) {
@@ -416,7 +473,7 @@ M.film({
   draw(ctx, u, t, IMG) {
     const v = t - LEAD;
     backdrop(ctx, t);
-    ({ tutorial, vie2, sab2, dom2 })[VID](ctx, v, t, IMG);
+    ({ tutorial, vie2, sab2, dom2, frascos })[VID](ctx, v, t, IMG);
   },
   post(ctx, u, t) {
     const f = Math.floor(t * 24); ctx.globalAlpha = 0.04; ctx.globalCompositeOperation = 'overlay';
